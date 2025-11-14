@@ -105,8 +105,9 @@ def feature_extractor(dataset, use_glcm=True, use_lbp=True, use_stats=True):
             df['Stats_Std'] = [np.std(img)]
             df['Stats_Var'] = [np.var(img)]
             df['Stats_Median'] = [np.median(img)]
+            # Adiciona estatísticas do Sobel (detecção de borda)
             sobel_img = sobel(img)
-            df['Sobel_Mean'] = [np.mean(sobel_img)]
+            df['Sobel_Mean'] = [np.mean(sobel_img)] # Mexi aqui pq deu erro
             df['Sobel_Std'] = [np.std(sobel_img)]
 
         image_dataset = pd.concat([image_dataset, df], ignore_index=True)
@@ -115,13 +116,7 @@ def feature_extractor(dataset, use_glcm=True, use_lbp=True, use_stats=True):
 
 # O EXPERIMENTO PRINCIPAL 
 
-classifiers = {
-    "SVM": svm.SVC(decision_function_shape='ovo', kernel='rbf', C=10),
-    "RandomForest": RandomForestClassifier(n_estimators=100, random_state=42),
-    "KNN": KNeighborsClassifier(n_neighbors=5),
-    "MLP": MLPClassifier(hidden_layer_sizes=(100,), max_iter=500, random_state=42, early_stopping=True),
-    "LightGBM": LGBMClassifier(n_estimators=100, random_state=42, verbosity=-1) # Adicionado verbosity=-1 para limpar o output
-}
+# (Dicionário de classificadores foi REMOVIDO DAQUI)
 
 feature_configs = [
     {"name": "GLCM_Only", "use_glcm": True, "use_lbp": False, "use_stats": False},
@@ -145,6 +140,14 @@ print("\n--- INICIANDO EXPERIMENTOS ---")
 for config in feature_configs:
     config_name = config["name"]
     print(f"\nTestando Configuração de Atributos: {config_name}")
+
+    classifiers = {
+        "SVM": svm.SVC(decision_function_shape='ovo', kernel='rbf', C=10),
+        "RandomForest": RandomForestClassifier(n_estimators=100, random_state=42),
+        "KNN": KNeighborsClassifier(n_neighbors=5),
+        "MLP": MLPClassifier(hidden_layer_sizes=(100,), max_iter=500, random_state=42, early_stopping=True),
+        "LightGBM": LGBMClassifier(n_estimators=100, random_state=42, verbosity=-1) 
+    }
 
     func_args = config.copy()
     del func_args['name'] 
